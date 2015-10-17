@@ -63,9 +63,9 @@ var server = require("http").createServer(function(req, res) {
 
     if (ip in userHash) {
       user = userHash[ip];
-      console.log("[INFO] IP ADDRESS found != %s", ip);
+      console.log("[INFO] IP ADDRESS found %s", ip);
     } else {
-      console.log("[INFO] IP ADDRESS not found != %s", ip);
+      console.log("[INFO] IP ADDRESS not found(新規接続) %s", ip);
     }
 
     var hokuto = ejs.render(indexEJS, {
@@ -97,14 +97,16 @@ io.sockets.on("connection", function (socket) {
   // 接続開始カスタムイベント(接続元ユーザを保存し、他ユーザへ通知)
   socket.on("connected", function (name) {
     userHash[socket.handshake.address] = name;
-    console.log("[INFO] IP ADDRESS FROM SOCKET= %s", socket.handshake.address);
+    console.log("[INFO] %s, %s connected", name, socket.handshake.address);
     io.sockets.emit("publish", {value: "入室しました", user: name, type: "start"});
   });
 
   // 再接続カスタムイベント(接続元ユーザを保存し、他ユーザへ通知)
   socket.on("reconnected", function (name) {
+    console.log("[INFO] %s, %s 再接続", userHash[socket.handshake.address], socket.handshake.address);
     io.sockets.emit("publish", {value: "再入室しました", user:userHash[socket.handshake.address] , type: "restart"});
     for (var i = 0; i < msgBuffer.count; i++) {
+      console.log("[INFO] 再送 : %s, %s", usrBuffer.get(i), msgBuffer.get(i).value);
       io.sockets.emit("publish", {value:msgBuffer.get(i).value.replace(/(https?:\/\/[\x21-\x7e]+)/gi, "<a href='$1'>$1</a>"), user:usrBuffer.get(i), type: "normal"});
     }
   });
@@ -114,16 +116,18 @@ io.sockets.on("connection", function (socket) {
     //console.log(data);
     msgBuffer.add(data);
     usrBuffer.add(userHash[socket.handshake.address]);
+    console.log("[INFO] %s, %s publish", userHash[socket.handshake.address], socket.handshake.address);
     io.sockets.emit("publish", {value:data.value.replace(/(https?:\/\/[\x21-\x7e]+)/gi, "<a href='$1'>$1</a>"), user:userHash[socket.handshake.address], type: "normal"});
   });
 
   // 接続終了組み込みイベント(接続元ユーザを削除し、他ユーザへ通知)
   socket.on("disconnect", function () {
-    if (userHash[socket.handshake.address]) {
-      var msg = userHash[socket.id] + "が退出しました";
-      io.sockets.emit("publish", {value: "退室しました", user: userHash[socket.handshake.address], type: "end"});
-      delete userHash[socket.id];
-    }
+    //if (userHash[socket.handshake.address]) {
+    console.log("[INFO] %s, %s 退出", userHash[socket.handshake.address], socket.handshake.address);
+    var msg = userHash[socket.id] + "が退出しました";
+    io.sockets.emit("publish", {value: "退室しました", user: userHash[socket.handshake.address], type: "end"});
+    delete userHash[socket.id];
+    //}
   });
 });
 
@@ -131,8 +135,8 @@ io.sockets.on("connection", function (socket) {
 function ipaddress (request) {
 
 //  console.log("request.headers['x-forwarded-for'] = " + request.headers['x-forwarded-for']);
-  console.log("request.connection = " + request.connection);
-  console.log("request.connection.remoteAddress = " + request.connection.remoteAddress);
+  //console.log("request.connection = " + request.connection);
+  //console.log("request.connection.remoteAddress = " + request.connection.remoteAddress);
 //  console.log("request.connection.socket = " + request.connection.socket);
 //  console.log("request.connection.socket.remoteAddress = " + request.connection.socket.remoteAddress);
 //  return request.headers['x-forwarded-for']
