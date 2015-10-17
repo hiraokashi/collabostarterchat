@@ -10,6 +10,7 @@ var userHash = {};
 var server = require("http").createServer(function(req, res) {
     var user = "";
     var ip = ipaddress(req);
+    console.log("[INFO] IP ADDRESS = %s", ip);
     if (ip in userHash) {
       user = userHash[ip];
     }
