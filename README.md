@@ -18,7 +18,7 @@
 
 ## 使い方
 ```
-git clone https://github.com/hatena-iti/collabostarterchat.git
+git clone https://github.com/hiraokashi/collabostarterchat.git
 cd collabostarterchat
 node app.js
 ```
