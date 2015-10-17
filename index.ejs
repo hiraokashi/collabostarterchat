@@ -138,6 +138,7 @@
       //$('#toppage').hide();
       $('#user_name_area').html('<span class="glyphicon glyphicon-user"> ユーザー名</span>:' + $('#inputuser').val())
       $('#chatform').show();
+      $('#msg').show();
       start($('#inputuser').val());
       $('#myName').val($('#inputuser').val());
     });
@@ -153,6 +154,7 @@
       restart(myName);
     } else {
       $('#chatform').hide();
+      $('#msg').hide();
     }
 
 
