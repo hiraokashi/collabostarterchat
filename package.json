@@ -9,7 +9,7 @@
   "dependencies": {
     "ejs": "2.3.3",
     "socket.io": ">= 0.9.6",
-    "cookie": "2.11.3"
+    "cookie": "0.2.2"
   },
   "engines": {
     "node": "0.12.7"
