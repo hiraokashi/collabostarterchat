@@ -1,5 +1,5 @@
 {
-  "name": "calm-retreat-9668",
+  "name": "cprotected-harbor-1407",
   "version": "0.1.5",
   "description": "A sample Node.js app using Express 4",
   "main": "app.js",
@@ -14,11 +14,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/heroku/calm-retreat-9668"
+    "url": "https://git.heroku.com/protected-harbor-1407.git"
   },
   "keywords": [
     "node",
-    "heroku",
+    "heroku"
   ],
   "license": "MIT"
 }
