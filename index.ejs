@@ -73,7 +73,7 @@
 
     socketio.on("connected", function(name) {});
     socketio.on("publish", function (data) { msgFunctions[data.type](data.value, data.user); });
-    socketio.on("disconnect", function () { resetview() });
+    socketio.on("disconnect", function () {});
 
     // 2.イベントに絡ませる関数の定義
     function start(name) {
@@ -92,14 +92,6 @@
       $('#message').val('');
     }
 
-    //接続がきれたらログイン画面を表示する
-    function resetview() {
-      $('#loginform').show();
-      $('#toppage').show();
-      $('#chatform').hide();
-      $('#msg').empty().hide();
-      $('#myName').val('');
-    }
 
     // ローカルでの処理　を種別に関数
     //..入室通知用
