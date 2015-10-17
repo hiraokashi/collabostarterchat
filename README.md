@@ -1,0 +1,2 @@
+# collabostarterchat
+collabostarterプロジェクトで使用する簡易チャットアプリ
