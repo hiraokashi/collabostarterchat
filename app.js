@@ -30,7 +30,8 @@ var server = require("http").createServer(function(req, res) {
   //var output = fs.readFileSync("./index.html", "utf-8");
   //res.end(output);
 }).listen(process.env.PORT || 5000, function(){
-   console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
+   //console.log("Express server listening on port %d in %s mode", server.address().port, server.settings.env);
+   console.log(Object.keys(server));
 });
 
  var io = require("socket.io").listen(server);
