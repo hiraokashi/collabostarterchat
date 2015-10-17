@@ -33,9 +33,6 @@ var server = require("http").createServer(function(req, res) {
 var io = require("socket.io").listen(server);
 
 
-
-
-
 // 2.イベントの定義
 io.sockets.on("connection", function (socket) {
 
@@ -52,7 +49,7 @@ io.sockets.on("connection", function (socket) {
 
   // メッセージ送信カスタムイベント
   socket.on("publish", function (data) {
-    console.log(data);
+    //console.log(data);
     io.sockets.emit("publish", {value:data.value, user:userHash[socket.handshake.address], type: "normal"});
   });
 
