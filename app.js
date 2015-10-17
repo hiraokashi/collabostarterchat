@@ -126,12 +126,12 @@ io.sockets.on("connection", function (socket) {
 
   // 接続終了組み込みイベント(接続元ユーザを削除し、他ユーザへ通知)
   socket.on("disconnect", function () {
-    //if (userHash[socket.handshake.address]) {
-    console.log("[INFO] %s, %s 退出", userHash[socket.handshake.address], socket.handshake.address);
-    var msg = userHash[socket.id] + "が退出しました";
-    io.sockets.emit("publish", {value: "退室しました", user: userHash[socket.handshake.address], type: "end"});
-    delete userHash[socket.id];
-    //}
+    if (userHash[socket.handshake.address]) {
+      console.log("[INFO] %s, %s 退出", userHash[socket.handshake.address], socket.handshake.address);
+      var msg = userHash[socket.id] + "が退出しました";
+      io.sockets.emit("publish", {value: "退室しました", user: userHash[socket.handshake.address], type: "end"});
+      delete userHash[socket.id];
+    }
   });
 });
 
