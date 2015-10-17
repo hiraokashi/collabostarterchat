@@ -74,19 +74,20 @@ io.sockets.on("connection", function (socket) {
 
 
 function ipaddress (request) {
-  console.log("request.headers['x-forwarded-for'] = " + request.headers['x-forwarded-for']);
-  console.log("request.connection = " + request.connection);
-  console.log("request.connection.remoteAddress = " + request.connection.remoteAddress);
-  console.log("request.connection.socket = " + request.connection.socket);
-  console.log("request.connection.socket.remoteAddress = " + request.connection.socket.remoteAddress);
-  return request.headers['x-forwarded-for']
-      ? request.headers['x-forwarded-for']
-      : (request.connection && request.connection.remoteAddress)
-      ? request.connection.remoteAddress
-      : (request.connection.socket && request.connection.socket.remoteAddress)
-      ? request.connection.socket.remoteAddress
-      : (request.socket && request.socket.remoteAddress)
-      ? request.socket.remoteAddress
-      : '0.0.0.0';
+    return request.connection.remoteAddress;
+//  console.log("request.headers['x-forwarded-for'] = " + request.headers['x-forwarded-for']);
+//  console.log("request.connection = " + request.connection);
+//  console.log("request.connection.remoteAddress = " + request.connection.remoteAddress);
+//  console.log("request.connection.socket = " + request.connection.socket);
+//  console.log("request.connection.socket.remoteAddress = " + request.connection.socket.remoteAddress);
+//  return request.headers['x-forwarded-for']
+//      ? request.headers['x-forwarded-for']
+//      : (request.connection && request.connection.remoteAddress)
+//      ? request.connection.remoteAddress
+//      : (request.connection.socket && request.connection.socket.remoteAddress)
+//      ? request.connection.socket.remoteAddress
+//      : (request.socket && request.socket.remoteAddress)
+//      ? request.socket.remoteAddress
+//      : '0.0.0.0';
 
 }
