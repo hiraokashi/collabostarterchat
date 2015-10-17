@@ -10,9 +10,12 @@ var userHash = {};
 var server = require("http").createServer(function(req, res) {
     var user = "";
     var ip = ipaddress(req);
-    console.log("[INFO] IP ADDRESS = %s", ip);
+
     if (ip in userHash) {
       user = userHash[ip];
+      console.log("[INFO] IP ADDRESS found != %s", ip);
+    } else {
+      console.log("[INFO] IP ADDRESS not found != %s", ip);
     }
 
     var hokuto = ejs.render(indexEJS, {
@@ -32,7 +35,7 @@ var server = require("http").createServer(function(req, res) {
   //res.end(output);
 }).listen(process.env.PORT || 5000, function(){
    //console.log("Express server listening on port %d in %s mode", server.address().port, server.settings.env);
-   console.log(Object.keys(server));
+   //console.log(Object.keys(server));
 });
 
  var io = require("socket.io").listen(server);
@@ -44,6 +47,7 @@ io.sockets.on("connection", function (socket) {
   // 接続開始カスタムイベント(接続元ユーザを保存し、他ユーザへ通知)
   socket.on("connected", function (name) {
     userHash[socket.handshake.address] = name;
+    console.log("[INFO] IP ADDRESS FROM SOCKET= %s", socket.handshake.address);
     io.sockets.emit("publish", {value: "入室しました", user: name, type: "start"});
   });
 
