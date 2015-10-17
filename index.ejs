@@ -32,7 +32,11 @@
     </div>
     <div class="row">
       <div class="col-md-12">
-        <div id="msg"></div>
+        <div id="msg">
+          <% for (var i = 0; i < previousMsgs.count; i++) { %>
+            <li class="alert alert-info"><%= previousUsrs.get(i) %><small><%= new Date().toLocaleTimeString() %></small><div><%= previousMsgs.get(i).value %></div></li>
+          <% } %>
+        </div>
       </div>
     </div>
     <div id="toppage" class="jumbotron" style="margin-top:10px; color:white; background-color:#3BAFDA">
@@ -105,6 +109,7 @@
         //var domMsg = $('<div></div>');
         var domMsg = $('<li>').append($('<small>').append(new Date().toLocaleTimeString() ));
         domMsg.addClass('alert alert-success').append($('<div>').append(user + 'が' + msg));
+
         msgArea.prepend(domMsg);
       },
     // 再入室
@@ -123,6 +128,7 @@
         //domMsg.text(new Date().toLocaleTimeString() + ' ' + msg);
         var domMsg = $('<li>').append($('<small>').append(new Date().toLocaleTimeString() ));
         domMsg.addClass('alert alert-danger').append($('<div>').append(user + 'が' + msg));
+
         msgArea.prepend(domMsg);
       },
     //..その他のメッセージ

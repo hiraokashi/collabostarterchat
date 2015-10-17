@@ -67,9 +67,11 @@ var server = require("http").createServer(function(req, res) {
     } else {
       console.log("[INFO] IP ADDRESS not found(新規接続) %s", ip);
     }
-
+    console.log("[INFO] previousUsrs.length= ", usrBuffer.count);
     var hokuto = ejs.render(indexEJS, {
-        user: user
+        user: user,
+        previousMsgs: msgBuffer,
+        previousUsrs: usrBuffer
     });
     res.writeHead(200, {'Content-Type': 'text/html'});
     res.write(hokuto);
@@ -99,20 +101,12 @@ io.sockets.on("connection", function (socket) {
     userHash[socket.handshake.address] = name;
     console.log("[INFO] %s, %s connected", name, socket.handshake.address);
     io.sockets.emit("publish", {value: "入室しました", user: name, type: "start"});
-    for (var i = 0; i < msgBuffer.count; i++) {
-      console.log("[INFO] 過去のメッセージ送信 : %s, %s", usrBuffer.get(i), msgBuffer.get(i).value);
-      io.sockets.emit("publish", {value:msgBuffer.get(i).value.replace(/(https?:\/\/[\x21-\x7e]+)/gi, "<a href='$1'>$1</a>"), user:usrBuffer.get(i), type: "normal"});
-    }
   });
 
   // 再接続カスタムイベント(接続元ユーザを保存し、他ユーザへ通知)
   socket.on("reconnected", function (name) {
     console.log("[INFO] %s, %s 再接続", userHash[socket.handshake.address], socket.handshake.address);
     io.sockets.emit("publish", {value: "再入室しました", user:userHash[socket.handshake.address] , type: "restart"});
-    for (var i = 0; i < msgBuffer.count; i++) {
-      console.log("[INFO] 再送 : %s, %s", usrBuffer.get(i), msgBuffer.get(i).value);
-      io.sockets.emit("publish", {value:msgBuffer.get(i).value.replace(/(https?:\/\/[\x21-\x7e]+)/gi, "<a href='$1'>$1</a>"), user:usrBuffer.get(i), type: "normal"});
-    }
   });
 
   // メッセージ送信カスタムイベント
