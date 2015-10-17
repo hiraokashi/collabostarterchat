@@ -1,5 +1,5 @@
 {
-  "name": "cprotected-harbor-1407",
+  "name": "protected-harbor-1407",
   "version": "0.1.5",
   "description": "A sample Node.js app using Express 4",
   "main": "app.js",
@@ -7,7 +7,7 @@
     "start": "node app.js"
   },
   "dependencies": {
-    "ejs": "2.11.3"
+    "ejs": "2.3.3"
   },
   "engines": {
     "node": "0.12.7"
