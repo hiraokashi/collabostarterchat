@@ -29,8 +29,11 @@ var server = require("http").createServer(function(req, res) {
   // https://madison87108.wordpress.com/2013/07/14/ejs%E3%81%AB%E8%A7%A6%E3%82%8C%E3%81%A6%E3%81%BF%E3%82%8B/
   //var output = fs.readFileSync("./index.html", "utf-8");
   //res.end(output);
-}).listen(8080);
-var io = require("socket.io").listen(server);
+}).listen(process.env.PORT || 5000, function(){
+   console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
+});
+
+ var io = require("socket.io").listen(server);
 
 
 // 2.イベントの定義
