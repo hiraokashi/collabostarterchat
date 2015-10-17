@@ -1,6 +1,9 @@
 ## 概要
  collabostarterプロジェクトで使用する簡易チャットアプリ
  Node.js v0.12.7 にて構築
+ 最初の接続時にユーザ名を入力してチャットできます。
+ IPにひも付けてユーザ名を保存するので、再接続の際もユーザ名の再入力不要
+
 
  (https://www.facebook.com/collabostarter)
 

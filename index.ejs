@@ -122,7 +122,7 @@
         //var domMsg = $('<div></div>');
         //domMsg.text(new Date().toLocaleTimeString() + ' ' + msg);
         var domMsg = $('<li>').append($('<small>').append(new Date().toLocaleTimeString() ));
-        domMsg.addClass('alert alert-info').append($('<div>').text(msg)).children('small').prepend(user + '：');
+        domMsg.addClass('alert alert-info').append($('<div>').html(msg)).children('small').prepend(user + '：');
         msgArea.prepend(domMsg);
       }
     }

@@ -59,7 +59,7 @@ io.sockets.on("connection", function (socket) {
   // メッセージ送信カスタムイベント
   socket.on("publish", function (data) {
     //console.log(data);
-    io.sockets.emit("publish", {value:data.value, user:userHash[socket.handshake.address], type: "normal"});
+    io.sockets.emit("publish", {value:data.value.replace(/(http:\/\/[\x21-\x7e]+)/gi, "<a href='$1'>$1</a>"), user:userHash[socket.handshake.address], type: "normal"});
   });
 
   // 接続終了組み込みイベント(接続元ユーザを削除し、他ユーザへ通知)
