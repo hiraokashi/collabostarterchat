@@ -1,0 +1,162 @@
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>CollaboStarterChat</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+
+
+</head>
+<body>
+  <div class="container">
+    <input type="hidden" id="myName" value=<%= user %>></input>
+    <div id="chatform" class="panel panel-info">
+    	<div class="panel-heading">
+    		<h4>
+    			<span class="label label-info" id="user_name_area"><span class="glyphicon glyphicon-user"> ユーザー名</span>：<%= user %></span>
+    		</h4>
+    	</div>
+    	<div class="panel-body">
+    		<div class="col-lg-6">
+    			<div class="input-group">
+    				<span class="input-group-addon"><span class="glyphicon glyphicon-pencil"></span></span>
+            <textarea id="message" name="message" class="form-control" rows="3"></textarea>
+    				<span class="input-group-btn">
+    					<button id="send" class="btn btn-primary"　>送信</button>
+    				</span>
+    			</div>
+    			<!-- /input-group -->
+    		</div>
+    		<!-- /.col-lg-6 -->
+    	</div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div id="msg"></div>
+      </div>
+    </div>
+    <div id="toppage" class="jumbotron" style="background-color:#3BAFDA">
+		  <h1>
+			   <span class="glyphicon glyphicon-comment">CollaboStarterChat</span>
+		  </h1>
+		  <h3>
+			   powered by Node.js v0.12.7
+		  </h3>
+	  </div>
+  	<div id="loginform"　class="form-group">
+				<div class="col-lg-6">
+					<div class="input-group">
+						<span class="input-group-addon">ユーザー名</span>
+						<input id="inputuser" type="text" name="username" class="form-control" placeholder="ユーザー名" required autofocus maxlength="20">
+						<span class="input-group-btn">
+							<button id="login" class="btn btn-success" type="submit">
+								<span class="glyphicon glyphicon-log-in"> 開始!</span>
+							</button>
+						</span>
+					</div>
+					<!-- /input-group -->
+				</div>
+				<!-- /.col-lg-6 -->
+		</div>
+  </div>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript">
+    // 1.イベントとコールバックの定義
+    var socketio = io.connect();
+
+    socketio.on("connected", function(name) {});
+    socketio.on("publish", function (data) { msgFunctions[data.type](data.value, data.user); });
+    socketio.on("disconnect", function () {});
+
+    // 2.イベントに絡ませる関数の定義
+    function start(name) {
+      socketio.emit("connected", name);
+      //var login = $("#login").val(name);
+      //login.value = name;
+    }
+
+    function restart(name) {
+      socketio.emit("reconnected", name);
+      //var login = $("#login").val(name);
+      //login.value = name;
+    }
+    function publishMessage() {
+      socketio.emit("publish", {value: $('#message').val()});
+      $('#message').val('');
+    }
+
+    // ローカルでの処理　を種別に関数
+    //..入室通知用
+    var msgFunctions = {
+    start:
+      function addMsgStart (msg, user) {
+        //var domMsg = $('<div></div>');
+        var domMsg = $('<li>').append($('<small>').append(new Date().toLocaleTimeString() ));
+        domMsg.addClass('alert alert-success').append($('<div>').append(user + 'が' + msg));
+        msgArea.prepend(domMsg);
+      },
+    // 再入室
+    restart:
+      function addMsgStart (msg, user) {
+        //var domMsg = $('<div></div>');
+        var domMsg = $('<li>').append($('<small>').append(new Date().toLocaleTimeString() ));
+        domMsg.addClass('alert alert-success').append($('<div>').append(user + 'が' + msg));
+        msgArea.prepend(domMsg);
+      },
+
+    //..退室通知用
+    end:
+      function addMsgEnd (msg, user) {
+        //var domMsg = $('<div></div>');
+        //domMsg.text(new Date().toLocaleTimeString() + ' ' + msg);
+        var domMsg = $('<li>').append($('<small>').append(new Date().toLocaleTimeString() ));
+        domMsg.addClass('alert alert-danger').append($('<div>').append(user + 'が' + msg));
+        msgArea.prepend(domMsg);
+      },
+    //..その他のメッセージ
+    normal:
+      function addMsgNormal (msg, user) {
+        //var domMsg = $('<div></div>');
+        //domMsg.text(new Date().toLocaleTimeString() + ' ' + msg);
+        var domMsg = $('<li>').append($('<small>').append(new Date().toLocaleTimeString() ));
+        domMsg.addClass('alert alert-info').append($('<div>').text(msg)).children('small').prepend(user + '：');
+        msgArea.prepend(domMsg);
+      }
+    }
+
+    $('#send').click(function() {
+      //なぜかonClickで発火しない
+      publishMessage();
+    });
+
+    $('#login').click(function() {
+      //ユーザ名入力して開始
+      $('#loginform').hide();
+      //$('#toppage').hide();
+      $('#user_name_area').html('<span class="glyphicon glyphicon-user"> ユーザー名</span>:' + $('#inputuser').val())
+      $('#chatform').show();
+      start($('#inputuser').val());
+      $('#myName').val($('#inputuser').val());
+    });
+
+    // 3.開始処理
+    var msgArea = $("#msg");
+    var myName = $("#myName").val();
+    //alert(login);
+    var startMsg = "";
+    if ($('#myName').val() != "") {
+      $('#loginform').hide();
+      //$('#toppage').hide();
+      restart(myName);
+    } else {
+      $('#chatform').hide();
+    }
+
+
+  </script>
+
+</body>
+</html>

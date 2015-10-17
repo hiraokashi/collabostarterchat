@@ -1,0 +1,81 @@
+// 1.モジュールオブジェクトの初期化
+var ejs = require('ejs');
+var fs = require("fs");
+
+var indexEJS = fs.readFileSync('./index.ejs', 'utf8');
+
+// ユーザ管理ハッシュ
+var userHash = {};
+
+var server = require("http").createServer(function(req, res) {
+    var user = "";
+    var ip = ipaddress(req);
+    if (ip in userHash) {
+      user = userHash[ip];
+    }
+
+    var hokuto = ejs.render(indexEJS, {
+        user: user
+    });
+    res.writeHead(200, {'Content-Type': 'text/html'});
+    res.write(hokuto);
+    res.end();
+
+  //var ip = ipaddress(req);
+
+  //console.log(ip);
+  //res.writeHead(200, {"Content-Type":"text/html"});
+
+  // https://madison87108.wordpress.com/2013/07/14/ejs%E3%81%AB%E8%A7%A6%E3%82%8C%E3%81%A6%E3%81%BF%E3%82%8B/
+  //var output = fs.readFileSync("./index.html", "utf-8");
+  //res.end(output);
+}).listen(8080);
+var io = require("socket.io").listen(server);
+
+
+
+
+
+// 2.イベントの定義
+io.sockets.on("connection", function (socket) {
+
+  // 接続開始カスタムイベント(接続元ユーザを保存し、他ユーザへ通知)
+  socket.on("connected", function (name) {
+    userHash[socket.handshake.address] = name;
+    io.sockets.emit("publish", {value: "入室しました", user: name, type: "start"});
+  });
+
+  // 再接続カスタムイベント(接続元ユーザを保存し、他ユーザへ通知)
+  socket.on("reconnected", function (name) {
+    io.sockets.emit("publish", {value: "再入室しました", user:userHash[socket.handshake.address] , type: "restart"});
+  });
+
+  // メッセージ送信カスタムイベント
+  socket.on("publish", function (data) {
+    console.log(data);
+    io.sockets.emit("publish", {value:data.value, user:userHash[socket.handshake.address], type: "normal"});
+  });
+
+  // 接続終了組み込みイベント(接続元ユーザを削除し、他ユーザへ通知)
+  socket.on("disconnect", function () {
+    if (userHash[socket.handshake.address]) {
+      var msg = userHash[socket.id] + "が退出しました";
+      io.sockets.emit("publish", {value: "退室しました", user: userHash[socket.handshake.address], type: "end"});
+      delete userHash[socket.id];
+    }
+  });
+});
+
+
+function ipaddress (request) {
+  return request.headers['x-forwarded-for']
+      ? request.headers['x-forwarded-for']
+      : (request.connection && request.connection.remoteAddress)
+      ? request.connection.remoteAddress
+      : (request.connection.socket && request.connection.socket.remoteAddress)
+      ? request.connection.socket.remoteAddress
+      : (request.socket && request.socket.remoteAddress)
+      ? request.socket.remoteAddress
+      : '0.0.0.0';
+
+}

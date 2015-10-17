@@ -1,0 +1,54 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>ホソミチチャット</title>
+</head>
+<body>
+  <textarea cols="50" rows="10" id="msg_input" style="width:200px;" ></textarea>
+  <button onclick="publishMessage();">語る</button>
+  <div id="msg"></div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript">
+    // 1.イベントとコールバックの定義
+    var socketio = io.connect('http://localhost:8080');
+
+    socketio.on("connected", function(name) {});
+    socketio.on("publish", function (data) { addMessage(data.value); });
+    socketio.on("disconnect", function () {});
+
+    // 2.イベントに絡ませる関数の定義
+    function start(name) {
+      socketio.emit("connected", name);
+      var login = document.getElementById("login");
+      login.value = name;
+
+    }
+
+    function publishMessage() {
+      var textInput = document.getElementById('msg_input');
+      var msg = "[" + myName + "] " + textInput.value;
+      socketio.emit("publish", {value: msg});
+      textInput.value = '';
+    }
+
+    function addMessage (msg) {
+      var domMeg = document.createElement('div');
+      domMeg.innerHTML = new Date().toLocaleTimeString() + ' ' + msg;
+      msgArea.appendChild(domMeg);
+    }
+
+    // 3.開始処理
+    var msgArea = document.getElementById("msg");
+    var login = document.getElementById("login").value;
+    alert(login);
+    var myName = "";
+    if (login == "0") {
+      myName = window.prompt("ユーザー名を入力してください", "");
+    } else {
+      nyName = login
+    }
+    addMessage("貴方は" + myName + "として入室しました");
+    start(myName);
+  </script>
+</body>
+</html>
