@@ -1,5 +1,5 @@
 {
-  "name": "protected-harbor-1407",
+  "name": "collabostarterchat",
   "version": "0.1.5",
   "description": "A sample Node.js app using Express 4",
   "main": "app.js",
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://git.heroku.com/protected-harbor-1407.git"
+    "url": "https://git.heroku.com/collabostarterchat.git"
   },
   "keywords": [
     "node",
