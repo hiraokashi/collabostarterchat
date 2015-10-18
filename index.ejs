@@ -102,6 +102,7 @@
         //再入室を考慮してチェック
         if($('#' + 'user_' + user).length){
           //～　ここに「＃sample」が存在した場合の処理を記述　～
+          alert("もうおりますがな");
           return;
         }
         var user_name = $('<span></span>').addClass('label label-default userlist').attr('id', 'user_' + user).text(user);
