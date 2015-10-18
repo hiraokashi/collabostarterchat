@@ -143,7 +143,7 @@ io.sockets.on("connection", function (socket) {
       console.log("[INFO] %s, %s removeuser", userHash[cookie_data], cookie_data);
       var msg = userHash[cookie_data] + "が退出しました";
       io.sockets.emit("publish", {value: "退室しました", user: userHash[cookie_data], time: data.time,type: "removeuser"});
-      //delete userHash[cookie_data];
+      delete userHash[cookie_data];
     }
   });
 
