@@ -5,7 +5,8 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
   <link rel="shortcut icon" href="favicon.ico">
-
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 </head>
 <body>
   <div class="container">
@@ -15,6 +16,7 @@
     		<h4>
     			<span class="label label-info" id="user_name_area"><span class="glyphicon glyphicon-user"> ユーザー名</span>：<%= user %></span>
     		</h4>
+        <span><button id="removeuser" class="btn btn-sm btn-danger"　>退室</button></span>
     	</div>
     	<div class="panel-body">
     		<div class="col-lg-6">
@@ -28,13 +30,19 @@
     			<!-- /input-group -->
     		</div>
     		<!-- /.col-lg-6 -->
+    		<div class="col-lg-6">
+          <% for (var i = 0; i < previousUsrs.count; i++) { %>
+            <span class="label label-default userlist"><%= previousUsrs.get(i) %></span>
+          <% } %>
+    		</div>
+    		<!-- /.col-lg-6 -->
     	</div>
     </div>
     <div class="row">
       <div class="col-md-12">
         <div id="msg">
           <% for (var i = 0; i < previousMsgs.count; i++) { %>
-            <li class="alert alert-info"><%= previousUsrs.get(i) %><small><%= new Date().toLocaleTimeString() %></small><div><%= previousMsgs.get(i).value %></div></li>
+            <li class="alert alert-info"><%= previousUsrs.get(i) %><small><%= previousMsgs.get(i).time %></small><div><%= previousMsgs.get(i).value %></div></li>
           <% } %>
         </div>
       </div>
@@ -64,90 +72,103 @@
 		</div>
   </div>
 
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+
   <script src="/socket.io/socket.io.js"></script>
   <script type="text/javascript">
-    // 1.イベントとコールバックの定義
+    //--------------------------------------------
+    // 1.サーバーからのイベントとコールバックの定義
+    //--------------------------------------------
     var socketio = io.connect();
 
     socketio.on("connected", function(name) {});
-    socketio.on("publish", function (data) { msgFunctions[data.type](data.value, data.user); });
+    socketio.on("publish", function (data) { viewFunctions[data.type](data.value, data.user); });
     socketio.on("disconnect", function () {});
 
-    // 2.イベントに絡ませる関数の定義
-    function start(name) {
-      socketio.emit("connected", name);
-      //var login = $("#login").val(name);
-      //login.value = name;
-    }
-
-    function restart(name) {
-      socketio.emit("reconnected", name);
-      //var login = $("#login").val(name);
-      //login.value = name;
-    }
-    function publishMessage() {
-      socketio.emit("publish", {value: $('#message').val()});
-      $('#message').val('');
-    }
-
-
-    // ローカルでの処理　を種別に関数
+    //-----------------------------------------------------------
+    // 2.サーバからのイベントをトリガーに、ビューへの更新処理　のリスト
+    //-------------------------------------------------------
+    var viewFunctions = {
     //..入室通知用
-    var msgFunctions = {
     start:
       function addMsgStart (msg, user) {
-        //var domMsg = $('<div></div>');
-        var domMsg = $('<li>').append($('<small>').append(new Date().toLocaleTimeString() ));
+        var domMsg = $('<li>').append($('<small>').append(msg.time));
         domMsg.addClass('alert alert-success').append($('<div>').append(user + 'が' + msg));
 
-        msgArea.prepend(domMsg);
-      },
-    // 再入室
-    restart:
-      function addMsgStart (msg, user) {
-        //var domMsg = $('<div></div>');
-        var domMsg = $('<li>').append($('<small>').append(new Date().toLocaleTimeString() ));
-        domMsg.addClass('alert alert-success').append($('<div>').append(user + 'が' + msg));
         msgArea.prepend(domMsg);
       },
 
     //..退室通知用
-    end:
+    removeuser:
       function addMsgEnd (msg, user) {
-        //var domMsg = $('<div></div>');
-        //domMsg.text(new Date().toLocaleTimeString() + ' ' + msg);
-        var domMsg = $('<li>').append($('<small>').append(new Date().toLocaleTimeString() ));
+        var domMsg = $('<li>').append($('<small>').append(msg.time));
         domMsg.addClass('alert alert-danger').append($('<div>').append(user + 'が' + msg));
 
         msgArea.prepend(domMsg);
       },
     //..その他のメッセージ
-    normal:
+    publish:
       function addMsgNormal (msg, user) {
-        //var domMsg = $('<div></div>');
-        //domMsg.text(new Date().toLocaleTimeString() + ' ' + msg);
-        var domMsg = $('<li>').append($('<small>').append(new Date().toLocaleTimeString() ));
+        var domMsg = $('<li>').append($('<small>').append(msg.time ));
         domMsg.addClass('alert alert-info').append($('<div>').html(msg)).children('small').prepend(user + '：');
         msgArea.prepend(domMsg);
       }
     }
 
+    //---------------------------------------------
+    // 3.ローカル→サーバーへ通知するイベントに絡ませる関数の定義
+    //---------------------------------------------
+    //入室
+    function start(name) {
+      $('#loginform').hide();
+      $('#chatform').show();
+      $('#msg').show();
+      $('#user_name_area').html('<span class="glyphicon glyphicon-user"> ユーザー名</span>:' + name);
+      $('#myName').val($('#inputuser').val());
+      socketio.emit("connected", {user: name, time: new Date().toLocaleTimeString()});
+    }
+
+    //退室(disconnectを使わない)
+    function removeuser(name) {
+      $('#loginform').show();
+      $('#chatform').hide();
+      $('#msg').hide();
+      $('#user_name_area').html('<span class="glyphicon glyphicon-user"> ユーザー名</span>:');
+      $('#myName').val('');
+      socketio.emit("removeuser", {user: name, time: new Date().toLocaleTimeString()});
+
+    }
+
+    function publishMessage() {
+      socketio.emit("publish", {value: $('#message').val(), time: new Date().toLocaleTimeString() });
+      $('#message').val('');
+    }
+
+    //-----------------------------------------------------
+    //  ローカル→サーバーへのイベントトリガー
+    //-----------------------------------------------------
     $('#send').click(function() {
       //なぜかonClickで発火しない
       publishMessage();
     });
 
+    $('#removeuser').click(function() {
+      //なぜかonClickで発火しない
+      removeuser($('#inputuser').val());
+    });
+
     $('#login').click(function() {
       //ユーザ名入力して開始
-      $('#loginform').hide();
-      //$('#toppage').hide();
-      $('#user_name_area').html('<span class="glyphicon glyphicon-user"> ユーザー名</span>:' + $('#inputuser').val())
-      $('#chatform').show();
-      $('#msg').show();
+      if ($('#inputuser').val() == "") {
+        alert("ユーザ名を入力してください");
+        return;
+      }
+      $('.userlist').each(function(){
+        if ($('#inputuser').val() == $(this).text()) {
+          alert("そのユーザ名は重複します")
+          return
+        }
+      });
       start($('#inputuser').val());
-      $('#myName').val($('#inputuser').val());
     });
 
     // 3.開始処理

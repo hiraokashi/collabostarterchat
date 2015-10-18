@@ -65,18 +65,21 @@ var server = require("http").createServer(function(req, res) {
     if (req.headers.cookie === undefined) {
       var d = new Date().toDateString();
       var serialized_cookie1 = cookie.serialize('uniqueID', Math.random().toString(36).slice(-8), {
-          maxAge : 12000 //有効期間を3600 * 3 秒に設定
+          maxAge : 86000 //有効期間を約24Hに設定、この時間内に退室しない場合userHashに参照されないデータが蓄積される
       });
       res.setHeader('Set-Cookie', serialized_cookie1);
       //Object.keys( serialized_cookie1 ); //=> []
-      console.log("おはつにおめにかかります");
+      console.log("初回リクエスト");
       userHash[serialized_cookie1.uniqueID] = "";
       //cookie_data = serialized_cookie1.uniqueID;
     } else {
       var parsed_cookie = cookie.parse(req.headers.cookie);
-      console.log("[INFO] parsed_cookie %s", Object.keys(parsed_cookie));
+      //console.log("[INFO] parsed_cookie %s", Object.keys(parsed_cookie));
       user = userHash[parsed_cookie.uniqueID];
-      console.log(user);
+      if (user === undefined) {
+        console.log(user);
+      }
+
       //cookie_data = parsed_cookie.uniqueID;
     }
 
@@ -88,7 +91,6 @@ var server = require("http").createServer(function(req, res) {
     res.writeHead(200, {'Content-Type': 'text/html'});
     res.write(hokuto);
     res.end();
-
   //var ip = ipaddress(req);
 
   //console.log(ip);
@@ -109,18 +111,11 @@ var server = require("http").createServer(function(req, res) {
 io.sockets.on("connection", function (socket) {
 
   // 接続開始カスタムイベント(接続元ユーザを保存し、他ユーザへ通知)
-  socket.on("connected", function (name) {
+  socket.on("connected", function (msg) {
     cookie_data = socket.handshake.headers.cookie.replace(/.+uniqueID=([a-zA-Z0-9]{8})$/gi, "$1");
-    userHash[cookie_data] = name;
+    userHash[cookie_data] = msg.user;
     console.log("[INFO] %s, %s connected", userHash[cookie_data] , cookie_data);
     io.sockets.emit("publish", {value: "入室しました", user: userHash[cookie_data] , type: "start"});
-  });
-
-  // 再接続カスタムイベント(接続元ユーザを保存し、他ユーザへ通知)
-  socket.on("reconnected", function (name) {
-    cookie_data = socket.handshake.headers.cookie.replace(/.+uniqueID=([a-zA-Z0-9]{8})$/gi, "$1");
-    console.log("[INFO] %s, %s 再接続", userHash[cookie_data], cookie_data);
-    io.sockets.emit("publish", {value: "再入室しました", user:userHash[cookie_data] , type: "restart"});
   });
 
   // メッセージ送信カスタムイベント
@@ -130,17 +125,36 @@ io.sockets.on("connection", function (socket) {
     msgBuffer.add(data);
     usrBuffer.add(userHash[cookie_data]);
     console.log("[INFO] %s, %s publish", userHash[cookie_data], cookie_data);
-    io.sockets.emit("publish", {value:data.value.replace(/(https?:\/\/[\x21-\x7e]+)/gi, "<a href='$1'>$1</a>"), user:userHash[cookie_data], type: "normal"});
+    io.sockets.emit("publish", {value:data.value.replace(/(https?:\/\/[\x21-\x7e]+)/gi, "<a href='$1'>$1</a>"), user:userHash[cookie_data], type: "publish"});
   });
 
-  // 接続終了組み込みイベント(接続元ユーザを削除し、他ユーザへ通知)
-  socket.on("disconnect", function () {
+  // 正式な退室イベント
+  socket.on("removeuser", function (msg) {
     cookie_data = socket.handshake.headers.cookie.replace(/.+uniqueID=([a-zA-Z0-9]{8})$/gi, "$1");
     if (userHash[cookie_data]) {
-      console.log("[INFO] %s, %s 退出", userHash[cookie_data], cookie_data);
+      console.log("[INFO] %s, %s removeuser", userHash[cookie_data], cookie_data);
       var msg = userHash[cookie_data] + "が退出しました";
-      io.sockets.emit("publish", {value: "退室しました", user: userHash[cookie_data], type: "end"});
+      io.sockets.emit("publish", {value: "退室しました", user: userHash[cookie_data], type: "removeuser"});
       //delete userHash[cookie_data];
     }
   });
+
+
+  //---------------------------------------------------------------------------------------------
+  // よく接続が切れる、ユーザ情報はCookieに基づきサーバが変数として保持するので以下のイベントではなにもしない
+  // 接続終了組み込みイベント(ユーザ情報はさくじょしない。)
+  //---------------------------------------------------------------------------------------------
+  socket.on("disconnect", function () {
+    cookie_data = socket.handshake.headers.cookie.replace(/.+uniqueID=([a-zA-Z0-9]{8})$/gi, "$1");
+    if (userHash[cookie_data]) {
+      console.log("[INFO] %s, %s disconnect(ユーザデータは削除しない)", userHash[cookie_data], cookie_data);
+    }
+  });
+
+  // 再接続カスタムイベント(ユーザへ通知しない)
+  socket.on("reconnected", function (name) {
+    cookie_data = socket.handshake.headers.cookie.replace(/.+uniqueID=([a-zA-Z0-9]{8})$/gi, "$1");
+    console.log("[INFO] %s, %s reconnected", userHash[cookie_data], cookie_data);
+  });
+
 });
