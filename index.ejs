@@ -116,7 +116,7 @@
         domMsg.addClass('alert alert-danger').append($('<div>').append(user + 'が' + msg));
 
         msgArea.prepend(domMsg);
-        alert("remove();");
+        alert(user + " ->remove();");
         $('#user_' + user ).remove();
 
         //２つ部ブラウザを立ち上げた時の対応　自分の退室指示をうけとったら反映する
