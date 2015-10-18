@@ -83,10 +83,18 @@ var server = require("http").createServer(function(req, res) {
       //cookie_data = parsed_cookie.uniqueID;
     }
 
+    var loginUser = [];
+    for (key in userHash) {
+      if (userHash[key] !== "") {
+        loginUser.push(userHash);
+      }
+    }
+
     var hokuto = ejs.render(indexEJS, {
         user: user,
         previousMsgs: msgBuffer,
-        previousUsrs: usrBuffer
+        previousUsrs: usrBuffer,
+        users: loginUser
     });
     res.writeHead(200, {'Content-Type': 'text/html'});
     res.write(hokuto);

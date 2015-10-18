@@ -66,8 +66,9 @@
 				</div>
 				<!-- /.col-lg-6 -->
     		<div id="userlistroot" class="col-lg-6">
-          <% for (var i = 0; i < previousUsrs.count; i++) { %>
-            <span class="label label-default userlist" id="<%= previousUsrs.get(i) %>"><%= previousUsrs.get(i) %></span>
+          <p>参加ユーザ</p>
+          <% for (var i = 0; i < users.length; i++) { %>
+            <span class="label label-default userlist" id="<%= users[i] %>"><%= users[i] %></span>
           <% } %>
     		</div>
     		<!-- /.col-lg-6 -->
