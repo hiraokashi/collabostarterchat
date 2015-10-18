@@ -112,7 +112,7 @@
         $('#user_' + user ).remove();
 
         //２つ部ブラウザを立ち上げた時の対応　自分の退室指示をうけとったら初期化する
-        if $('#myName').val() == user) {
+        if ($('#myName').val() == user) {
           $('#loginform').show();
           $('#chatform').hide();
           $('#msg').hide();
