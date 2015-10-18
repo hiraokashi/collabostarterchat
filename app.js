@@ -99,17 +99,9 @@ var server = require("http").createServer(function(req, res) {
     res.writeHead(200, {'Content-Type': 'text/html'});
     res.write(hokuto);
     res.end();
-  //var ip = ipaddress(req);
 
-  //console.log(ip);
-  //res.writeHead(200, {"Content-Type":"text/html"});
-
-  // https://madison87108.wordpress.com/2013/07/14/ejs%E3%81%AB%E8%A7%A6%E3%82%8C%E3%81%A6%E3%81%BF%E3%82%8B/
-  //var output = fs.readFileSync("./index.html", "utf-8");
-  //res.end(output);
 }).listen(process.env.PORT || 5000, function(){
-   //console.log("Express server listening on port %d in %s mode", server.address().port, server.settings.env);
-   //console.log(Object.keys(server));
+  // doNothing
 });
 
  var io = require("socket.io").listen(server);
