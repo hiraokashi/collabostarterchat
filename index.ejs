@@ -100,6 +100,14 @@
         msgArea.prepend(domMsg);
         var user_name = $('<span></span>').addClass('label label-default userlist').attr('id', 'user_' + user).text(user);
         $('#userlistroot').append(user_name);
+        //２つ部ブラウザを立ち上げた時の対応　自分の退室指示をうけとったら反映する
+        if ($('#myName').val() == user) {
+          $('#loginform').hide();
+          $('#chatform').show();
+          $('#msg').show();
+          $('#user_name_area').html('<span class="glyphicon glyphicon-user"> ユーザー名</span>:' + name);
+          $('#myName').val($('#inputuser').val());
+        }
       },
 
     //..退室通知用
@@ -111,7 +119,7 @@
         msgArea.prepend(domMsg);
         $('#user_' + user ).remove();
 
-        //２つ部ブラウザを立ち上げた時の対応　自分の退室指示をうけとったら初期化する
+        //２つ部ブラウザを立ち上げた時の対応　自分の退室指示をうけとったら反映する
         if ($('#myName').val() == user) {
           $('#loginform').show();
           $('#chatform').hide();
