@@ -111,11 +111,11 @@ var server = require("http").createServer(function(req, res) {
 io.sockets.on("connection", function (socket) {
 
   // 接続開始カスタムイベント(接続元ユーザを保存し、他ユーザへ通知)
-  socket.on("connected", function (msg) {
+  socket.on("connected", function (data) {
     cookie_data = socket.handshake.headers.cookie.replace(/.+uniqueID=([a-zA-Z0-9]{8})$/gi, "$1");
-    userHash[cookie_data] = msg.user;
+    userHash[cookie_data] = data.user;
     console.log("[INFO] %s, %s connected", userHash[cookie_data] , cookie_data);
-    io.sockets.emit("publish", {value: "入室しました", user: userHash[cookie_data] , type: "start"});
+    io.sockets.emit("publish", {value: "入室しました", user: userHash[cookie_data] , time: data.time, type: "start"});
   });
 
   // メッセージ送信カスタムイベント
@@ -125,16 +125,16 @@ io.sockets.on("connection", function (socket) {
     msgBuffer.add(data);
     usrBuffer.add(userHash[cookie_data]);
     console.log("[INFO] %s, %s publish", userHash[cookie_data], cookie_data);
-    io.sockets.emit("publish", {value:data.value.replace(/(https?:\/\/[\x21-\x7e]+)/gi, "<a href='$1'>$1</a>"), user:userHash[cookie_data], type: "publish"});
+    io.sockets.emit("publish", {value:data.value.replace(/(https?:\/\/[\x21-\x7e]+)/gi, "<a href='$1'>$1</a>"), user:userHash[cookie_data], time: data.time, type: "publish"});
   });
 
   // 正式な退室イベント
-  socket.on("removeuser", function (msg) {
+  socket.on("removeuser", function (data) {
     cookie_data = socket.handshake.headers.cookie.replace(/.+uniqueID=([a-zA-Z0-9]{8})$/gi, "$1");
     if (userHash[cookie_data]) {
       console.log("[INFO] %s, %s removeuser", userHash[cookie_data], cookie_data);
       var msg = userHash[cookie_data] + "が退出しました";
-      io.sockets.emit("publish", {value: "退室しました", user: userHash[cookie_data], type: "removeuser"});
+      io.sockets.emit("publish", {value: "退室しました", user: userHash[cookie_data], time: data.time,type: "removeuser"});
       //delete userHash[cookie_data];
     }
   });

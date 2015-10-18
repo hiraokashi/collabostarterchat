@@ -15,8 +15,9 @@
     	<div class="panel-heading">
     		<h4>
     			<span class="label label-info" id="user_name_area"><span class="glyphicon glyphicon-user"> ユーザー名</span>：<%= user %></span>
+          <span><button id="removeuser" class="btn btn-sm btn-danger"　>退室</button></span>
     		</h4>
-        <span><button id="removeuser" class="btn btn-sm btn-danger"　>退室</button></span>
+
     	</div>
     	<div class="panel-body">
     		<div class="col-lg-6">
@@ -81,7 +82,7 @@
     var socketio = io.connect();
 
     socketio.on("connected", function(name) {});
-    socketio.on("publish", function (data) { viewFunctions[data.type](data.value, data.user); });
+    socketio.on("publish", function (data) { viewFunctions[data.type](data.value, data.user, data.time); });
     socketio.on("disconnect", function () {});
 
     //-----------------------------------------------------------
@@ -90,8 +91,8 @@
     var viewFunctions = {
     //..入室通知用
     start:
-      function addMsgStart (msg, user) {
-        var domMsg = $('<li>').append($('<small>').append(msg.time));
+      function addMsgStart (msg, user, time) {
+        var domMsg = $('<li>').append($('<small>').append(time));
         domMsg.addClass('alert alert-success').append($('<div>').append(user + 'が' + msg));
 
         msgArea.prepend(domMsg);
@@ -99,16 +100,16 @@
 
     //..退室通知用
     removeuser:
-      function addMsgEnd (msg, user) {
-        var domMsg = $('<li>').append($('<small>').append(msg.time));
+      function addMsgEnd (msg, user, time) {
+        var domMsg = $('<li>').append($('<small>').append(time));
         domMsg.addClass('alert alert-danger').append($('<div>').append(user + 'が' + msg));
 
         msgArea.prepend(domMsg);
       },
     //..その他のメッセージ
     publish:
-      function addMsgNormal (msg, user) {
-        var domMsg = $('<li>').append($('<small>').append(msg.time ));
+      function addMsgNormal (msg, user, time) {
+        var domMsg = $('<li>').append($('<small>').append(time ));
         domMsg.addClass('alert alert-info').append($('<div>').html(msg)).children('small').prepend(user + '：');
         msgArea.prepend(domMsg);
       }
