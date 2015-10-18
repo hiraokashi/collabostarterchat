@@ -31,12 +31,7 @@
     			<!-- /input-group -->
     		</div>
     		<!-- /.col-lg-6 -->
-    		<div id="userlistroot" class="col-lg-6">
-          <% for (var i = 0; i < previousUsrs.count; i++) { %>
-            <span class="label label-default userlist"><%= previousUsrs.get(i) %></span>
-          <% } %>
-    		</div>
-    		<!-- /.col-lg-6 -->
+
     	</div>
     </div>
     <div class="row">
@@ -70,6 +65,12 @@
 					<!-- /input-group -->
 				</div>
 				<!-- /.col-lg-6 -->
+    		<div id="userlistroot" class="col-lg-6">
+          <% for (var i = 0; i < previousUsrs.count; i++) { %>
+            <span class="label label-default userlist" id="<%= previousUsrs.get(i) %>"><%= previousUsrs.get(i) %></span>
+          <% } %>
+    		</div>
+    		<!-- /.col-lg-6 -->
 		</div>
   </div>
 
@@ -96,7 +97,7 @@
         domMsg.addClass('alert alert-success').append($('<div>').append(user + 'が' + msg));
 
         msgArea.prepend(domMsg);
-        var user_name = $('<span></span>').addClass('label label-default userlist').text(user);
+        var user_name = $('<span></span>').addClass('label label-default userlist').attr('id', 'user_' + user).text(user);
         $('#userlistroot').append(user_name);
       },
 
@@ -107,6 +108,7 @@
         domMsg.addClass('alert alert-danger').append($('<div>').append(user + 'が' + msg));
 
         msgArea.prepend(domMsg);
+        $('#user_' + user ).remove();
       },
     //..その他のメッセージ
     publish:
@@ -165,12 +167,16 @@
         alert("ユーザ名を入力してください");
         return;
       }
+      var rslt = true;
       $('.userlist').each(function(){
         if ($('#inputuser').val() == $(this).text()) {
           alert("そのユーザ名は重複します")
-          return
+          rslt = false
         }
       });
+      if (rslt == false) {
+        return;
+      }
       start($('#inputuser').val());
     });
 
