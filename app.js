@@ -86,7 +86,7 @@ var server = require("http").createServer(function(req, res) {
     var loginUser = [];
     for (key in userHash) {
       if (userHash[key] !== "") {
-        loginUser.push(userHash);
+        loginUser.push(userHash[key]);
       }
     }
 
