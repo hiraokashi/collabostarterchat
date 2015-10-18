@@ -133,7 +133,7 @@ io.sockets.on("connection", function (socket) {
     msgBuffer.add(data);
     usrBuffer.add(userHash[cookie_data]);
     console.log("[INFO] %s, %s publish", userHash[cookie_data], cookie_data);
-    io.sockets.emit("publish", {value:data.value.replace(/(https?:\/\/[\x21-\x7e]+)/gi, "<a href='$1'>$1</a>"), user:userHash[cookie_data], time: data.time, type: "publish"});
+    io.sockets.emit("publish", {value:data.value.replace(/(https?\:\/\/[\-_\.\!\~\*\'\(\)a-zA-Z0-9\;\/\?\:\@\&\=\+\$\,\%\#]+)/gi, "<a href='$1'>$1</a>"), user:userHash[cookie_data], time: data.time, type: "publish"});
   });
 
   // 正式な退室イベント

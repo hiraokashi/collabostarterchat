@@ -37,7 +37,7 @@
     <div class="row">
       <div class="col-md-12">
         <div id="msg">
-          <% for (var i = 0; i < previousMsgs.count; i++) { %>
+          <% for (var i = previousMsgs.count - 1; i >= 0; i--) { %>
             <li class="alert alert-info"><%= previousUsrs.get(i) %><small><%= previousMsgs.get(i).time %></small><div><%= previousMsgs.get(i).value %></div></li>
           <% } %>
         </div>
@@ -98,6 +98,12 @@
         domMsg.addClass('alert alert-success').append($('<div>').append(user + 'が' + msg));
 
         msgArea.prepend(domMsg);
+
+        //再入室を考慮してチェック
+        if($('#' + 'user_' + user).length){
+          //～　ここに「＃sample」が存在した場合の処理を記述　～
+          return;
+        }
         var user_name = $('<span></span>').addClass('label label-default userlist').attr('id', 'user_' + user).text(user);
         $('#userlistroot').append(user_name);
       },
